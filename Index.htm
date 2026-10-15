@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Satta King Fast Result & Admin Panel</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; padding: 20px; background: #f4f4f9; }
+        header { background: #333; color: #fff; padding: 15px; text-align: center; border-radius: 5px; }
+        nav { margin: 20px 0; text-align: center; }
+        nav button { padding: 10px 20px; margin: 0 5px; cursor: pointer; font-size: 16px; }
+        .section { display: none; background: #fff; padding: 20px; border-radius: 5px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        .active { display: block; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: center; }
+        th { background: #333; color: white; }
+        .card { background: #e2e8f0; padding: 15px; margin-bottom: 15px; border-radius: 5px; }
+        input, button { padding: 8px; margin: 5px 0; width: 100%; box-sizing: border-box; }
+        .form-container { max-width: 400px; margin: auto; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Satta King Fast Live Result & Portal</h1>
+    </header>
+
+    <nav>
+        <button onclick="showSection('home')">Live Results</button>
+        <button onclick="checkAdminLogin()">Admin Panel</button>
+    </nav>
+
+    <!-- HOME SECTION -->
+    <div id="home" class="section active">
+        <h2>Today's Live Updates</h2>
+        <div class="card" id="today-card">
+            <h3>Disawar: <span id="res-disawar">--</span></h3>
+            <h3>Faridabad: <span id="res-faridabad">--</span></h3>
+            <h3>Ghaziabad: <span id="res-ghaziabad">--</span></h3>
+            <h3>Gali: <span id="res-gali">--</span></h3>
+        </div>
+
+        <h2>Recent Records Chart</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Disawar</th>
+                    <th>Faridabad</th>
+                    <th>Ghaziabad</th>
+                    <th>Gali</th>
+                </tr>
+            </thead>
+            <tbody id="history-table-body">
+                <!-- Data will load here dynamically -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- ADMIN SECTION -->
+    <div id="admin" class="section">
+        <div class="form-container">
+            <h2>Admin Control Panel</h2>
+            <p>Add / Update Results</p>
+            <form id="admin-form" onsubmit="saveResult(event)">
+                <label>Date:</label>
+                <input type="date" id="admin-date" required>
+                
+                <label>Disawar:</label>
+                <input type="text" id="admin-disawar" placeholder="XX">
+                
+                <label>Faridabad:</label>
+                <input type="text" id="admin-faridabad" placeholder="XX">
+                
+                <label>Ghaziabad:</label>
+                <input type="text" id="admin-ghaziabad" placeholder="XX">
+                
+                <label>Gali:</label>
+                <input type="text" id="admin-gali" placeholder="XX">
+                
+                <button type="submit" style="background: #28a745; color: white; border: none;">Save Result</button>
+            </form>
+            <button onclick="showSection('home')" style="background: #6c757d; color: white; border: none; margin-top: 10px;">Back to Home</button>
+        </div>
+    </div>
+
+    <script>
+        // Switch between tabs
+        function showSection(sectionId) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+            if(sectionId === 'home') {
+                loadData();
+            }
+        }
+
+        // Simple password check for Admin
+        function checkAdminLogin() {
+            let pass = prompt("Enter Admin Password (default: secret123):");
+            if (pass === "secret123" || pass === "admin") {
+                showSection('admin');
+            } else if (pass !== null) {
+                alert("Incorrect Password!");
+            }
+        }
+
+        // Save Result using browser localStorage
+        function saveResult(event) {
+            event.preventDefault();
+            let date = document.getElementById('admin-date').value;
+            let disawar = document.getElementById('admin-disawar').value || "XX";
+            let faridabad = document.getElementById('admin-faridabad').value || "XX";
+            let ghaziabad = document.getElementById('admin-ghaziabad').value || "XX";
+            let gali = document.getElementById('admin-gali').value || "XX";
+
+            let records = JSON.parse(localStorage.getItem('satta_records')) || [];
+            
+            // Check if date already exists, update it or add new
+            let existingIndex = records.findIndex(r => r.date === date);
+            if (existingIndex >= 0) {
+                records[existingIndex] = { date, disawar, faridabad, ghaziabad, gali };
+            } else {
+                records.unshift({ date, disawar, faridabad, ghaziabad, gali });
+            }
+
+            localStorage.setItem('satta_records', JSON.stringify(records));
+            alert("Result Saved Successfully!");
+            document.getElementById('admin-form').reset();
+            showSection('home');
+        }
+
+        // Load data into HTML table and cards
+        function loadData() {
+            let records = JSON.parse(localStorage.getItem('satta_records')) || [];
+            let tbody = document.getElementById('history-table-body');
+            tbody.innerHTML = "";
+
+            if (records.length > 0) {
+                // Show latest on top card
+                document.getElementById('res-disawar').innerText = records[0].disawar;
+                document.getElementById('res-faridabad').innerText = records[0].faridabad;
+                document.getElementById('res-ghaziabad').innerText = records[0].ghaziabad;
+                document.getElementById('res-gali').innerText = records[0].gali;
+
+                records.forEach(row => {
+                    let tr = document.createElement('tr');
+                    tr.innerHTML = `<td>${row.date}</td><td>${row.disawar}</td><td>${row.faridabad}</td><td>${row.ghaziabad}</td><td>${row.gali}</td>`;
+                    tbody.appendChild(tr);
+                });
+            } else {
+                tbody.innerHTML = `<tr><td colspan="5">No records found. Use Admin Panel to add results.</td></tr>`;
+            }
+        }
+
+        // Initial load
+        loadData();
+    </script>
+</body>
+  </html>
+  
